@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PostRequest index{% endblock %}
+
+{% block body %}
+    <h1>PostRequest index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Status</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for post_request in post_requests %}
+            <tr>
+                <td>{{ post_request.id }}</td>
+                <td>{{ post_request.status }}</td>
+                <td>
+                    <a href="{{ path('post_request_show', {'id': post_request.id}) }}">show</a>
+                    <a href="{{ path('post_request_edit', {'id': post_request.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('post_request_new') }}">Create new</a>
+{% endblock %}
