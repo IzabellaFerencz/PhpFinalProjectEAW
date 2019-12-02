@@ -12,12 +12,14 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="#">WebSiteName</a>
+                    <a class="navbar-brand" href="/post">WebSiteName</a>
                 </div>
                 <ul class="nav navbar-nav">
                     <li><a href="/post">Posts</a></li>
                     {% if app.session.get('username')!='' %}
                         <li><a href="/account/profile">My Profile</a></li>
+                        <li><a href="/post/request/my_requests">My Requests</a></li>
+                        <li><a href="/post/my_posts">My Posts</a></li>
                     {% endif %}
                 </ul>
                 {% if app.session.get('username')!='' %}

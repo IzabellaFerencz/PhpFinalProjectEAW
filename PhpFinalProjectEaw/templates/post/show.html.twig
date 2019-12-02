@@ -25,6 +25,10 @@
                 <th>Status</th>
                 <td>{{ post.status }}</td>
             </tr>
+            <tr>
+                <th>Posted by</th>
+                <td>{{ post.getUserId().getUsername() }}</td>
+            </tr>
         </tbody>
     </table>
 

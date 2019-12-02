@@ -27,6 +27,24 @@ class PostController extends AbstractController
     }
 
     /**
+     * @Route("/my_posts", name="my_posts", methods={"GET"})
+     */
+    public function my_posts(PostRepository $postRepository): Response
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user==null){
+            return $this->render('account/error.html.twig', [
+                'Message' => "You must be logged in!",
+                ]);
+        }
+        return $this->render('post/index.html.twig', [
+            'posts' => $postRepository->findByUserId($user->getId()),
+        ]);
+    }
+
+    /**
      * @Route("/new", name="newpost", methods={"GET"})
      */
     public function newpost()

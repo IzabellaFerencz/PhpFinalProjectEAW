@@ -22,19 +22,29 @@ class PostRequestRepository extends ServiceEntityRepository
     // /**
     //  * @return PostRequest[] Returns an array of PostRequest objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByPostId($value)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
+            ->andWhere('p.postid = :val')
             ->setParameter('val', $value)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
+    public function findByUserId($value)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.userid = :val')
+            ->setParameter('val', $value)
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    
 
     /*
     public function findOneBySomeField($value): ?PostRequest

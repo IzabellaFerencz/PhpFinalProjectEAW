@@ -12,15 +12,19 @@
                 <td>{{ post_request.id }}</td>
             </tr>
             <tr>
+                <th>User</th>
+                <td>{{ post_request.getUserId().getUsername() }}</td>
+            </tr>
+            <tr>
+                <th>Post Title</th>
+                <td>{{ post_request.getPostId().getTitle() }} | <a href="/post/{{post_request.postid}}">view post</a></td>
+            </tr>
+            <tr>
                 <th>Status</th>
                 <td>{{ post_request.status }}</td>
             </tr>
         </tbody>
     </table>
-
-    <a href="{{ path('post_request_index') }}">back to list</a>
-
-    <a href="{{ path('post_request_edit', {'id': post_request.id}) }}">edit</a>
 
     {{ include('post_request/_delete_form.html.twig') }}
 {% endblock %}

@@ -1,14 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}PostRequest index{% endblock %}
+{% block title %}My Requests{% endblock %}
 
 {% block body %}
-    <h1>PostRequest index</h1>
+    <h1>My Requests</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Post Title</th>
                 <th>Status</th>
                 <th>actions</th>
             </tr>
@@ -17,10 +18,12 @@
         {% for post_request in post_requests %}
             <tr>
                 <td>{{ post_request.id }}</td>
+                <td>{{ post_request.getPostId().getTitle() }}</td>
                 <td>{{ post_request.status }}</td>
                 <td>
                     <a href="{{ path('post_request_show', {'id': post_request.id}) }}">show</a>
-                    <a href="{{ path('post_request_edit', {'id': post_request.id}) }}">edit</a>
+                    |
+                    <a href="/post/{{post_request.postid}}">view post</a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +34,4 @@
         </tbody>
     </table>
 
-    <a href="{{ path('post_request_new') }}">Create new</a>
 {% endblock %}
