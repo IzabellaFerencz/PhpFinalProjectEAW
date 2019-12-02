@@ -3,13 +3,14 @@
 {% block title %}My Requests{% endblock %}
 
 {% block body %}
-    <h1>My Requests</h1>
+    <h1>Requests</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Post Title</th>
+                <th>From</th>
                 <th>Status</th>
                 <th>actions</th>
             </tr>
@@ -19,11 +20,22 @@
             <tr>
                 <td>{{ post_request.id }}</td>
                 <td>{{ post_request.getPostId().getTitle() }}</td>
+                <td>{{ post_request.getUserId().getUsername() }}</td>
                 <td>{{ post_request.status }}</td>
                 <td>
                     <a href="{{ path('post_request_show', {'id': post_request.id}) }}">show</a>
                     |
                     <a href="/post/{{post_request.postid}}">view post</a>
+                </td>
+                <td>
+                    {% if accept_actions == true %}
+                    {% if post_request.getPostId().status=="Active"%}
+                        {% if post_request.status=='Waiting' %}
+                            <a href="/post/request/reply/{{post_request.id}}/Accepted" class="btn btn-success">Accept</a>
+                            <a href="/post/request/reply/{{post_request.id}}/Rejected" class="btn btn-danger">Reject</a>
+                        {% endif %}
+                        {% endif %}
+                    {% endif %}
                 </td>
             </tr>
         {% else %}

@@ -36,7 +36,79 @@ class PostRequestController extends AbstractController
 
         return $this->render('post_request/index.html.twig', [
             'post_requests' => $repo->findByUserId($user->getId()),
+            'accept_actions'=>false,
         ]);
+    }
+
+    /**
+     * @Route("/view_post_requests/{postid}", name="view_post_requests", methods={"GET"})
+     */
+    public function view_post_requests($postid)
+    {
+        $post = $this->getDoctrine()->getRepository(Post::class)->find($postid);
+        if($post == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No post found with id=".$postid,
+                ]);
+        }
+
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null || $user != $post->getUserId())
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized!",
+                ]);
+        }
+
+        $repo = $this->getDoctrine()->getRepository(PostRequest::class);
+
+        return $this->render('post_request/index.html.twig', [
+            'post_requests' => $repo->findByPostId($postid),
+            'accept_actions'=>true,
+        ]);
+    }
+
+    /**
+     * @Route("/reply/{id}/{reply}", name="post_request_reply", methods={"GET"})
+     */
+    public function reply($id, $reply)
+    {
+        $postRequest = $this->getDoctrine()->getRepository(PostRequest::class)->find($id);
+        if($postRequest == null )
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No post request was found with id=".$id,
+                ]);
+        }
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized!",
+                ]);
+        }
+
+        $post = $postRequest->getPostid();
+        if($user != $post->getUserId())
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized!",
+                ]);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $postRequest->setStatus($reply);
+        if($reply == "Accepted")
+        {
+            $post->setStatus("Resolved");
+        }
+        $entityManager->flush();
+        return $this->redirectToRoute('view_post_requests/'.$post->getId());
     }
 
     /**
