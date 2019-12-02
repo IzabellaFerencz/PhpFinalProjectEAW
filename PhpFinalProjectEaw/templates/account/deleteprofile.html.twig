@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Delete{% endblock %}
+
+{% block body %}
+    <h1>Delete</h1>
+    <br/>
+    <h3>Are you sure you want to delete your profile?</h3>
+    <div class="btn btn-danger"><a href="/account/deleteprofile_confirmed">Yes</a></div>
+    <div class="btn btn-info"><a href="/account/profile">No</a></div>
+    
+{% endblock %}

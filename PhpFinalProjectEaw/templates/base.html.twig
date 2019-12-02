@@ -15,11 +15,17 @@
                     <a class="navbar-brand" href="#">WebSiteName</a>
                 </div>
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#">Posts</a></li>
-                    <li><a href="/account/register">Register</a></li>
-                    <li><a href="#">Page 3</a></li>
+                    <li><a href="/post">Posts</a></li>
+                    {% if app.session.get('username')!='' %}
+                        <li><a href="/account/profile">My Profile</a></li>
+                    {% endif %}
                 </ul>
+                {% if app.session.get('username')!='' %}
+                    <div style="float:right;">{{app.session.get('username')}}<a href="/account/logout">Log out</a></div>
+                {% else %}
+                    <div style="float:right; margin:10px;" class="btn btn-info"><a href="/account/login">Log in</a></div>
+                    <div style="float:right; margin:10px;" class="btn btn-success"><a href="/account/register">Register</a></div>
+                {% endif %}
             </div>
         </nav>
         {% block body %}{% endblock %}
