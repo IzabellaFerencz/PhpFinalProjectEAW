@@ -15,7 +15,7 @@
                     {% if app.session.get('username') == post.getUserId().getUsername() %}
                         <a style="float:right;margin-right:10px;" href="#" class="btn btn-info">View Requests</a>
                         <div style="float:right;margin-right:10px;">{{ include('post/_delete_form.html.twig') }} </div>                   
-                        <a style="float:right;margin-right:10px;" href="{{ path('post_edit', {'id': post.id}) }}" class="btn btn-warning">Edit</a>
+                        <a style="float:right;margin-right:10px;" href="{{ path('post_edit_get', {'id': post.id}) }}" class="btn btn-warning">Edit</a>
                     {% else %}
                         <a style="float:right;margin-right:10px;" href="#" class="btn btn-info">Send Request</a>
                     {% endif %}

@@ -1,35 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Post{% endblock %}
+{% block title %}New Post{% endblock %}
 
 {% block body %}
-    <h1>Edit Post</h1>
+    <h1>Create Post</h1>
     <br/>
     
-    <form action="/post/{{post.getId()}}/edit" method="POST" class = "form-horizontal">
+    <form action="/post/new" method="POST" class = "form-horizontal">
 
-        <input type="hidden" name="id" value="{{post.getId()}}"/>
         <div class="form-group">
             <label class="col-md-2 control-label">Title:</label>
             <div class="col-md-4">
-                <input type="text" class = "form-control" value="{{post.getTitle()}}" name="title" required="true">
+                <input type="text" class = "form-control" name="title" required="true">
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label">Description:</label>
             <div class="col-md-4">
-                <input type="text" class = "form-control" value="{{post.getDescription()}}" name="description" required="true">
+                <input type="text" class = "form-control" name="description" required="true">
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label">Status:</label>
             <div class="col-md-4">
-                <select name="status" class = "form-control" selected="{{post.getStatus()}}">
-                    <option value="Active">Active</option>
-                    <option value="Resolved">Resolved</option>
-                    <option value="Expired">Expired</option>
+                <select name="status" class = "form-control">
+                    <option value="Active" selected>Active</option>
                 </select>
             </div>
         </div>

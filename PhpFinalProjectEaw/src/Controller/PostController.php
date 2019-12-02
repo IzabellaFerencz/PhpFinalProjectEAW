@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,9 +27,9 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="post_new", methods={"GET","POST"})
+     * @Route("/new", name="newpost", methods={"GET"})
      */
-    public function new(Request $request): Response
+    public function newpost()
     {
         $session = $this->get('session');
         $username = $session->get('username');
@@ -37,22 +38,42 @@ class PostController extends AbstractController
                 'Message' => "You must be logged in to create a post!",
                 ]);
         }
-        $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
-        $form->handleRequest($request);
+        return $this->render('post/newpost.html.twig', [
+        ]);
+    }
 
-        if ($form->isSubmitted() && $form->isValid()) {
+    /**
+     * @Route("/new", name="post_new", methods={"POST"})
+     */
+    public function new(Request $request): Response
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user==null){
+            return $this->render('account/error.html.twig', [
+                'Message' => "You must be logged in to create a post!",
+                ]);
+        }
+        $title = $_POST["title"];
+        $description = $_POST["description"];
+        $status = $_POST["status"];
+        try {
+            $post = new Post();
+            $post->setTitle($title);
+            $post->setDescription($description);
+            $post->setStatus($status);
+            $post->setUserid($user);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($post);
             $entityManager->flush();
-
-            return $this->redirectToRoute('post_index');
+        } catch (\Throwable $th) {
+            return $this->render('account/error.html.twig', [
+                'Message' => "Something went wrong!",
+                ]);
         }
 
-        return $this->render('post/new.html.twig', [
-            'post' => $post,
-            'form' => $form->createView(),
-        ]);
+        return $this->redirectToRoute('post_index');        
     }
 
     /**
@@ -66,22 +87,66 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="post_edit", methods={"GET","POST"})
+     * @Route("/{id}/edit", name="post_edit_get", methods={"GET"})
      */
-    public function edit(Request $request, Post $post): Response
+    public function editpost($id)
     {
-        $form = $this->createForm(PostType::class, $post);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('post_index');
+        $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
+        if($post == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No post was found with id=".$id,
+                ]);
         }
-
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null || $user != $post->getUserid())
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized to edit this post!",
+                ]);
+        }
         return $this->render('post/edit.html.twig', [
             'post' => $post,
-            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit", name="post_edit", methods={"POST"})
+     */
+    public function edit($id): Response
+    {
+        $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
+        if($post == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No post was found with id=".$id,
+                ]);
+        }
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null || $user != $post->getUserid())
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized to edit this post!",
+                ]);
+        }
+
+        $title = $_POST["title"];
+        $description = $_POST["description"];
+        $status = $_POST["status"];
+
+        $post->setTitle($title);
+        $post->setDescription($description);
+        $post->setStatus($status);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+
+        return $this->render('post/show.html.twig', [
+            'post' => $post,
         ]);
     }
 
