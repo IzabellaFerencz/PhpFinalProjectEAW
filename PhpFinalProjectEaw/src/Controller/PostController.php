@@ -30,6 +30,13 @@ class PostController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        if($username==''){
+            return $this->render('account/error.html.twig', [
+                'Message' => "You must be logged in to create a post!",
+                ]);
+        }
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);

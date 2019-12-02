@@ -39,7 +39,7 @@ class AccountController extends AbstractController
         }
         $newuser = new User();
         $newuser->setUsername($username);
-        $newuser->setPassword($password);
+        $newuser->setPassword(password_hash($password,PASSWORD_DEFAULT));
         try {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($newuser);
@@ -72,7 +72,7 @@ class AccountController extends AbstractController
 
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
 
-        if($user->getPassword() == $password)
+        if(password_verify($password, $user->getPassword()))
         {
             $session = $this->get('session');
             $session->set('username',$username);
@@ -118,7 +118,7 @@ class AccountController extends AbstractController
             if($userprofile == null)
             {
                 return $this->render('account/createprofile.html.twig', [
-                    ]);
+            ]);
             }
             return $this->render('account/profile.html.twig', [
                 'profile' => $userprofile,

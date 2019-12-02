@@ -21,7 +21,7 @@
                     {% endif %}
                 </ul>
                 {% if app.session.get('username')!='' %}
-                    <div style="float:right;">{{app.session.get('username')}}<a href="/account/logout">Log out</a></div>
+                    <div style="float:right; margin-top:10px;">Welcome, {{app.session.get('username')}}!<a class="btn btn-info" style="margin-left:10px;" href="/account/logout">Log out</a></div>
                 {% else %}
                     <div style="float:right; margin:10px;" class="btn btn-info"><a href="/account/login">Log in</a></div>
                     <div style="float:right; margin:10px;" class="btn btn-success"><a href="/account/register">Register</a></div>
