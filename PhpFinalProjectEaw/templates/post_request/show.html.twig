@@ -24,6 +24,7 @@
                 <td>{{ post_request.status }}</td>
             </tr>
             {% if post_request.getPostId().getUserId().getUsername() == app.session.get('username') %}
+                {% if post_request.getPostId().status=="Active"%}
                 <tr>
                     <th>Actions</th>
                     <td>
@@ -31,6 +32,7 @@
                             <a href="/post/request/reply/{{post_request.id}}/Rejected" class="btn btn-danger">Reject</a>
                     </td>
                 </tr>
+                {% endif %}
             {% endif %}
         </tbody>
     </table>

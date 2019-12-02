@@ -101,6 +101,13 @@ class PostRequestController extends AbstractController
                 ]);
         }
 
+        if($post->getStatus() != "Active")
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "Post is not Active!",
+                ]);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $postRequest->setStatus($reply);
         if($reply == "Accepted")
