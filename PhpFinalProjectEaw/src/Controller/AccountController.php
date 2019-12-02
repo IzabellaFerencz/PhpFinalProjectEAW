@@ -44,6 +44,8 @@ class AccountController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($newuser);
             $entityManager->flush();
+            $session = $this->get('session');
+            $session->set('username',$username);
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' => "Username already exists. Please use a different username or log in to your account.",
