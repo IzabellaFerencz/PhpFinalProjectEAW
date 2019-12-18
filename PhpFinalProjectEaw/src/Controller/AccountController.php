@@ -30,6 +30,12 @@ class AccountController extends AbstractController
     {
         $username = $_POST["username"];
         $password = $_POST["password"];
+        if($username == "" || $password == "")
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "Username and password cant be empty",
+                ]);
+        }
         $confpassword = $_POST["confpassword"];
         if($password != $confpassword)
         {
@@ -71,7 +77,12 @@ class AccountController extends AbstractController
     {
         $username = $_POST["username"];
         $password = $_POST["password"];
-
+        if($username == "" || $password == "")
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "Username and password cant be empty",
+                ]);
+        }
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
 
         if(password_verify($password, $user->getPassword()))
