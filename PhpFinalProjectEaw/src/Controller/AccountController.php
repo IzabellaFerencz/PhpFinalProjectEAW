@@ -140,8 +140,7 @@ class AccountController extends AbstractController
             $userprofile = $user->getUserprofileid();
             if($userprofile == null)
             {
-                return $this->render('account/createprofile.html.twig', [
-            ]);
+                return $this->redirectToRoute('create_profile');
             }
             return $this->render('account/profile.html.twig', [
                 'profile' => $userprofile,
@@ -166,6 +165,11 @@ class AccountController extends AbstractController
                 ]);
         }
         return $this->render('account/createprofile.html.twig', [
+            'Firstname' => "",
+            'Lastname' => "",
+            'PhoneNr' => "",
+            'Address' => "",
+            'Message' => ""
             ]);
     }
 
@@ -180,6 +184,7 @@ class AccountController extends AbstractController
             $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
             if($user == null)
             {
+                
                 return $this->render('account/error.html.twig', [
                     'Message' => "You must be logged in to create a profile!",
                     ]);
@@ -194,6 +199,17 @@ class AccountController extends AbstractController
             $lname = $_POST["lastname"];
             $phone = $_POST["phonenr"];
             $adr = $_POST["address"];
+
+            if($fname == "" || $lname == "" || $phone == "" || $adr == "")
+            {
+                return $this->render('account/createprofile.html.twig', [
+                    'Firstname' => $fname,
+                    'Lastname' => $lname,
+                    'PhoneNr' => $phone,
+                    'Address' => $adr,
+                    'Message' => "All fields are mandatory!"
+                    ]);
+            }
 
             $profile = new UserProfile();
             $profile->setFirstname($fname);
@@ -236,6 +252,7 @@ class AccountController extends AbstractController
             $userprofile = $user->getUserprofileid();
             return $this->render('account/editprofile.html.twig', [
                 'profile'=>$userprofile,
+                'Message' => ""
                 ]);
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
@@ -270,6 +287,14 @@ class AccountController extends AbstractController
             $lname = $_POST["lastname"];
             $phone = $_POST["phonenr"];
             $adr = $_POST["address"];
+
+            if($fname == "" || $lname == "" || $phone == "" || $adr == "")
+            {
+                return $this->render('account/editprofile.html.twig', [
+                    'profile' => $profile,
+                    'Message' => "All fields are mandatory!"
+                    ]);
+            }
 
             $profile->setFirstname($fname);
             $profile->setLastname($lname);
@@ -316,7 +341,7 @@ class AccountController extends AbstractController
             if($user == null)
             {
                 return $this->render('account/error.html.twig', [
-                    'Message' => "You must be logged in to delete your profile!",
+                    'Message' => "User not found!",
                     ]);
             }
             $profile = $user->getUserprofileid();
