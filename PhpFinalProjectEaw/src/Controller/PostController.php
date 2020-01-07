@@ -57,6 +57,9 @@ class PostController extends AbstractController
                 ]);
         }
         return $this->render('post/newpost.html.twig', [
+            'Title' => "",
+            'Description' => "",
+            'Message' => ""
         ]);
     }
 
@@ -76,6 +79,25 @@ class PostController extends AbstractController
         $title = $_POST["title"];
         $description = $_POST["description"];
         $status = $_POST["status"];
+
+        if($title == "" || $description == "" || $status == "")
+        {
+            return $this->render('post/newpost.html.twig', [
+                'Title' => $title,
+                'Description' => $description,
+                'Message' => "All Fields are mandatory"
+            ]);
+        }
+
+        if($status != "Active")
+        {
+            return $this->render('post/newpost.html.twig', [
+                'Title' => $title,
+                'Description' => $description,
+                'Message' => "All new post must be in active state!"
+            ]);
+        }
+
         try {
             $post = new Post();
             $post->setTitle($title);
@@ -97,8 +119,15 @@ class PostController extends AbstractController
     /**
      * @Route("/{id}", name="post_show", methods={"GET"})
      */
-    public function show(Post $post): Response
+    public function show($id): Response
     {
+        $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
+        if($post == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No post found with given id!",
+                ]);
+        }
         return $this->render('post/show.html.twig', [
             'post' => $post,
         ]);
@@ -127,6 +156,7 @@ class PostController extends AbstractController
         }
         return $this->render('post/edit.html.twig', [
             'post' => $post,
+            'Message' => ""
         ]);
     }
 
@@ -155,6 +185,22 @@ class PostController extends AbstractController
         $title = $_POST["title"];
         $description = $_POST["description"];
         $status = $_POST["status"];
+
+        if($title == "" || $description == "" || $status == "")
+        {
+            return $this->render('post/edit.html.twig', [
+                'post' => $post,
+                'Message' => "All Fields are mandatory"
+            ]);
+        }
+
+        if($status != "Active" && $status != "Resolved" && $status != "Expired")
+        {
+            return $this->render('post/edit.html.twig', [
+                'post' => $post,
+                'Message' => "Invalid value for status"
+            ]);
+        }
 
         $post->setTitle($title);
         $post->setDescription($description);
