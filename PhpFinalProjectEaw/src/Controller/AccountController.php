@@ -20,6 +20,8 @@ class AccountController extends AbstractController
     public function register()
     {
         return $this->render('account/register.html.twig', [
+            'Username' => "",
+            'Message' => ""
         ]);
     }
 
@@ -32,16 +34,19 @@ class AccountController extends AbstractController
         $password = $_POST["password"];
         if($username == "" || $password == "")
         {
-            return $this->render('account/error.html.twig', [
-                'Message' => "Username and password cant be empty",
+            return $this->render('account/register.html.twig', [
+                'Username' => $username,
+                'Message' => "Username and password can't be empty",
                 ]);
         }
         $confpassword = $_POST["confpassword"];
         if($password != $confpassword)
         {
-            return $this->render('account/error.html.twig', [
+            return $this->render('account/register.html.twig', [
+                'Username' => $username,
                 'Message' => "Password and confirmation password do not match",
                 ]);
+            
         }
         $newuser = new User();
         $newuser->setUsername($username);
@@ -53,7 +58,9 @@ class AccountController extends AbstractController
             $session = $this->get('session');
             $session->set('username',$username);
         } catch (\Throwable $th) {
-            return $this->render('account/error.html.twig', [
+
+            return $this->render('account/register.html.twig', [
+                'Username' => $username,
                 'Message' => "Username already exists. Please use a different username or log in to your account.",
                 ]);
         }
@@ -67,6 +74,8 @@ class AccountController extends AbstractController
     public function login()
     {
         return $this->render('account/login.html.twig', [
+            'Username' => "",
+            'Message' => ""
         ]);
     }
 
@@ -79,7 +88,8 @@ class AccountController extends AbstractController
         $password = $_POST["password"];
         if($username == "" || $password == "")
         {
-            return $this->render('account/error.html.twig', [
+            return $this->render('account/login.html.twig', [
+                'Username' => $username,
                 'Message' => "Username and password cant be empty",
                 ]);
         }
@@ -89,14 +99,14 @@ class AccountController extends AbstractController
         {
             $session = $this->get('session');
             $session->set('username',$username);
-            return $this->render('account/error.html.twig', [
-                'Message' => "Good",
+            return $this->render('post.html.twig', [
                 ]);
         }
         else
         {
-            return $this->render('account/error.html.twig', [
-                'Message' => "bad",
+            return $this->render('account/login.html.twig', [
+                'Username' => $username,
+                'Message' => "Incorrect username or password",
                 ]);
         }
 

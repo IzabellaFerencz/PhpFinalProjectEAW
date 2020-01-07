@@ -6,13 +6,14 @@
     <h1>Log In</h1>
     <br/>
     <a href="/account/register">Register as new user</a>
-    
+    <div style="margin:20px; color:red;">{{Message}}</div>
+
     <form action="/account/login" method="POST" class = "form-horizontal">
 
         <div class="form-group">
             <label class="col-md-2 control-label">Username:</label>
             <div class="col-md-4">
-                <input type="text" class = "form-control" name="username" required="true">
+                <input type="text" class = "form-control" name="username" value="{{Username}}" required="true">
             </div>
         </div>
 
