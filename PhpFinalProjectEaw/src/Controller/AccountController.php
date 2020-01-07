@@ -99,8 +99,7 @@ class AccountController extends AbstractController
         {
             $session = $this->get('session');
             $session->set('username',$username);
-            return $this->render('post.html.twig', [
-                ]);
+            return $this->redirectToRoute('post_index');
         }
         else
         {

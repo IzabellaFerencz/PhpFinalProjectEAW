@@ -188,6 +188,12 @@ class PostRequestController extends AbstractController
     public function show($id)
     {
         $postRequest = $this->getDoctrine()->getRepository(PostRequest::class)->find($id);
+        if($postRequest == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No request found with id=".$id,
+                ]);
+        }
         $session = $this->get('session');
         $username = $session->get('username');
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
