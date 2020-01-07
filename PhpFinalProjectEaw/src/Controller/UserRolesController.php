@@ -18,11 +18,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserRolesController extends AbstractController
 {
 
+    private function verifyUser(): bool
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
+        $roles = $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
+        foreach ($roles as $role) 
+        {
+            if($role->getRoleId()->getRolename() == "admin")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @Route("/rolesofuser/{id}", name="roles_of_user", methods={"GET"})
      */
     public function showUserWithRoles($id): Response
     {
+        if($this->verifyUser()==false)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
         if($user == null)
         {
@@ -43,6 +71,12 @@ class UserRolesController extends AbstractController
      */
     public function viewUsers(): Response
     {
+        if($this->verifyUser()==false)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
         $users =$this->getDoctrine()->getRepository(User::class)->findAll();
         return $this->render('user_roles/viewusers.html.twig', [
             'users' => $users,
@@ -54,6 +88,12 @@ class UserRolesController extends AbstractController
      */
     public function assignRole($userId): Response
     {
+        if($this->verifyUser()==false)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
         $user =$this->getDoctrine()->getRepository(User::class)->find($userId);
         if($user == null)
         {
@@ -73,6 +113,12 @@ class UserRolesController extends AbstractController
      */
     public function assignRolePost(): Response
     {
+        if($this->verifyUser()==false)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
         $userid = $_POST["userid"];
         $roleid = $_POST["role"];
         $user =$this->getDoctrine()->getRepository(User::class)->find($userid);
@@ -117,6 +163,12 @@ class UserRolesController extends AbstractController
      */
     public function delete(Request $request, UserRoles $userRole): Response
     {
+        if($this->verifyUser()==false)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "You are not authorized",
+                ]);
+        }
         try 
         {
             $entityManager = $this->getDoctrine()->getManager();
