@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\UserRoles;
+use App\Entity\User;
+use App\Entity\Roles;
 use App\Form\UserRolesType;
 use App\Repository\UserRolesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,80 +17,118 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UserRolesController extends AbstractController
 {
+
     /**
-     * @Route("/", name="user_roles_index", methods={"GET"})
+     * @Route("/rolesofuser/{id}", name="roles_of_user", methods={"GET"})
      */
-    public function index(UserRolesRepository $userRolesRepository): Response
+    public function showUserWithRoles($id): Response
     {
-        return $this->render('user_roles/index.html.twig', [
-            'user_roles' => $userRolesRepository->findAll(),
+        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+        if($user == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No user found with given id!",
+                ]);
+        }
+        $roles = $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($id);
+
+        return $this->render('user_roles/user_with_roles.html.twig', [
+            'user' => $user,
+            'roles' => $roles
         ]);
     }
 
     /**
-     * @Route("/new", name="user_roles_new", methods={"GET","POST"})
+     * @Route("/index", name="users", methods={"GET"})
      */
-    public function new(Request $request): Response
+    public function viewUsers(): Response
     {
-        $userRole = new UserRoles();
-        $form = $this->createForm(UserRolesType::class, $userRole);
-        $form->handleRequest($request);
+        $users =$this->getDoctrine()->getRepository(User::class)->findAll();
+        return $this->render('user_roles/viewusers.html.twig', [
+            'users' => $users,
+            ]);
+    }
 
-        if ($form->isSubmitted() && $form->isValid()) {
+    /**
+     * @Route("/addrole/{userId}", name="add_role", methods={"GET"})
+     */
+    public function assignRole($userId): Response
+    {
+        $user =$this->getDoctrine()->getRepository(User::class)->find($userId);
+        if($user == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No user with given id!",
+                ]);
+        }
+        $roles = $this->getDoctrine()->getRepository(Roles::class)->findAll();
+        return $this->render('user_roles/addrole.html.twig', [
+            'user' => $user,
+            'roles' => $roles
+            ]);
+    }
+
+    /**
+     * @Route("/addrole", name="add_role_post", methods={"POST"})
+     */
+    public function assignRolePost(): Response
+    {
+        $userid = $_POST["userid"];
+        $roleid = $_POST["role"];
+        $user =$this->getDoctrine()->getRepository(User::class)->find($userid);
+        $role =$this->getDoctrine()->getRepository(Roles::class)->find($roleid);
+        if($user == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No user with given id!",
+                ]);
+        }
+        if($role == null)
+        {
+            return $this->render('account/error.html.twig', [
+                'Message' => "No role with given id!",
+                ]);
+        }
+
+        try {
+            $existingrole = $this->getDoctrine()->getRepository(UserRoles::class)->findByUserIdAndRoleId($userid, $roleid);
+            if($existingrole != null)
+            {
+                return $this->render('account/error.html.twig', [
+                    'Message' => "Role is already assigned to user!",
+                    ]);
+            }
+            $userRole = new UserRoles();
+            $userRole->setUserid($user);
+            $userRole->setRoleid($role);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($userRole);
             $entityManager->flush();
-
-            return $this->redirectToRoute('user_roles_index');
+        } catch (\Throwable $th) {
+            return $this->render('account/error.html.twig', [
+                'Message' => "Failed to add role!",
+                ]);
         }
-
-        return $this->render('user_roles/new.html.twig', [
-            'user_role' => $userRole,
-            'form' => $form->createView(),
-        ]);
+        return $this->redirectToRoute('roles_of_user', ['id' => $userRole->getUserid()]);
     }
 
     /**
-     * @Route("/{id}", name="user_roles_show", methods={"GET"})
-     */
-    public function show(UserRoles $userRole): Response
-    {
-        return $this->render('user_roles/show.html.twig', [
-            'user_role' => $userRole,
-        ]);
-    }
-
-    /**
-     * @Route("/{id}/edit", name="user_roles_edit", methods={"GET","POST"})
-     */
-    public function edit(Request $request, UserRoles $userRole): Response
-    {
-        $form = $this->createForm(UserRolesType::class, $userRole);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('user_roles_index');
-        }
-
-        return $this->render('user_roles/edit.html.twig', [
-            'user_role' => $userRole,
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/{id}", name="user_roles_delete", methods={"DELETE"})
+     * @Route("/{id}/delete", name="user_roles_delete", methods={"GET"})
      */
     public function delete(Request $request, UserRoles $userRole): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$userRole->getId(), $request->request->get('_token'))) {
+        try 
+        {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($userRole);
             $entityManager->flush();
+        } 
+        catch (\Throwable $th)
+        {
+            //throw $th;
         }
 
-        return $this->redirectToRoute('user_roles_index');
+
+        return $this->redirectToRoute('roles_of_user', ['id' => $userRole->getUserid()]);
     }
 }

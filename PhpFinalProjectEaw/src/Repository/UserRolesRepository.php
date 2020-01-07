@@ -22,11 +22,11 @@ class UserRolesRepository extends ServiceEntityRepository
     // /**
     //  * @return UserRoles[] Returns an array of UserRoles objects
     //  */
-    /*
-    public function findByExampleField($value)
+    
+    public function findByUserId($value)
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
+            ->andWhere('u.userid = :val')
             ->setParameter('val', $value)
             ->orderBy('u.id', 'ASC')
             ->setMaxResults(10)
@@ -34,7 +34,21 @@ class UserRolesRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+
+    public function findByUserIdAndRoleId($userid, $roleid)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.userid = :val1')
+            ->setParameter('val1', $userid)
+            ->andWhere('u.roleid = :val2')
+            ->setParameter('val2', $roleid)            
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    
 
     /*
     public function findOneBySomeField($value): ?UserRoles

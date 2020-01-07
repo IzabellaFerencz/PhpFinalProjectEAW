@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Assign New Role{% endblock %}
+
+{% block body %}
+    <h1>Assign new role</h1>
+    <br/>
+
+    <div>Assign role for user: {{user.getUsername()}}</div>
+    <form action="/user/roles/addrole" method="POST" class = "form-horizontal">
+        <input type="hidden" value={{user.getId()}} name="userid"/>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Role:</label>
+            <div class="col-md-4">
+                {% for role in roles %}
+                    <select name="role" class = "form-control">
+                        <option value="{{role.getId()}}">{{role.getRolename()}}</option>
+                    </select>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" class="btn btn-default" value="Save" />
+            </div>
+        </div>
+        
+    </form> 
+    
+{% endblock %}

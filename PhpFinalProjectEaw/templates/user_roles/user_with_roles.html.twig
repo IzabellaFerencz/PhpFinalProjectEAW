@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Roles for user{% endblock %}
+
+{% block body %}
+    <h1>UserRoles</h1>
+
+    <h3>Username: {{user.getUsername()}}</h3>
+    <a href="/user/roles/addrole/{{user.getId()}}">Add role</a>
+    <br/>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>RoleName</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for role in roles%}
+            <tr>
+                <td>{{role.getRoleId().getRolename()}}</td>
+                <td><a href="/user/roles/{{role.id}}/delete">Remove</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
