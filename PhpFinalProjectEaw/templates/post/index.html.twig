@@ -12,6 +12,7 @@
                     <div style="float:right;">{{ post.status }}</div>
                     <h3>{{ post.title }} </h3>
                     <p>{{ post.description }}</p>
+                    <p>Price: {{ post.price }} RON</p>
                     {% if app.session.get('username') == post.getUserId().getUsername() %}
                         <a style="float:right;margin-right:10px;" href="/post/request/view_post_requests/{{post.id}}" class="btn btn-info">View Requests</a>
                         <div style="float:right;margin-right:10px;">{{ include('post/_delete_form.html.twig') }} </div>                   

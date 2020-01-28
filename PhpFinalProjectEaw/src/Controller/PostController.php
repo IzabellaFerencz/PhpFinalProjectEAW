@@ -59,7 +59,8 @@ class PostController extends AbstractController
         return $this->render('post/newpost.html.twig', [
             'Title' => "",
             'Description' => "",
-            'Message' => ""
+            'Message' => "",
+            'Price' =>""
         ]);
     }
 
@@ -79,12 +80,14 @@ class PostController extends AbstractController
         $title = $_POST["title"];
         $description = $_POST["description"];
         $status = $_POST["status"];
+        $price = $_POST["price"];
 
-        if($title == "" || $description == "" || $status == "")
+        if($title == "" || $description == "" || $status == "" || $price == "")
         {
             return $this->render('post/newpost.html.twig', [
                 'Title' => $title,
                 'Description' => $description,
+                'Price' => $price,
                 'Message' => "All Fields are mandatory"
             ]);
         }
@@ -94,6 +97,7 @@ class PostController extends AbstractController
             return $this->render('post/newpost.html.twig', [
                 'Title' => $title,
                 'Description' => $description,
+                'Price' => $price,
                 'Message' => "All new post must be in active state!"
             ]);
         }
@@ -102,6 +106,7 @@ class PostController extends AbstractController
             $post = new Post();
             $post->setTitle($title);
             $post->setDescription($description);
+            $post->setPrice($price);
             $post->setStatus($status);
             $post->setUserid($user);
             $entityManager = $this->getDoctrine()->getManager();
@@ -185,8 +190,9 @@ class PostController extends AbstractController
         $title = $_POST["title"];
         $description = $_POST["description"];
         $status = $_POST["status"];
+        $price = $_POST["price"];
 
-        if($title == "" || $description == "" || $status == "")
+        if($title == "" || $description == "" || $status == "" || $price == "")
         {
             return $this->render('post/edit.html.twig', [
                 'post' => $post,
@@ -205,6 +211,7 @@ class PostController extends AbstractController
         $post->setTitle($title);
         $post->setDescription($description);
         $post->setStatus($status);
+        $post->setPrice($price);
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();
