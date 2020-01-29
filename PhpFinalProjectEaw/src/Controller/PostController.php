@@ -109,6 +109,17 @@ class PostController extends AbstractController
             $post->setPrice($price);
             $post->setStatus($status);
             $post->setUserid($user);
+
+            if(!$post->isValid())
+            {
+                return $this->render('post/newpost.html.twig', [
+                    'Title' => $title,
+                    'Description' => $description,
+                    'Price' => $price,
+                    'Message' => "Post is in invalid state."
+                ]);
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($post);
             $entityManager->flush();
@@ -212,6 +223,14 @@ class PostController extends AbstractController
         $post->setDescription($description);
         $post->setStatus($status);
         $post->setPrice($price);
+
+        if(!$post->isValid())
+        {
+            return $this->render('post/edit.html.twig', [
+                'post' => $post,
+                'Message' => "Post is in invalid state."
+            ]);
+        }
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();

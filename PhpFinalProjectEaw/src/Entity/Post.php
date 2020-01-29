@@ -42,6 +42,23 @@ class Post
      */
     private $status;
 
+    public function isValid()
+    {
+        if($this->title == "" || $this->description == "")
+        {
+            return false;
+        }
+        if($this->price < 0)
+        {
+            return false;
+        }
+        if($this->status != "Active" && $this->status != "Resolved" && $this->status != "Expired")
+        {
+            return false;
+        }
+        return true;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -36,6 +36,15 @@ class UserProfile
      */
     private $lastname;
 
+    public function isValid()
+    {
+        if($this->address == "" || $this->phonenr == "" || $this->firstname == "" || $this->lastname == "")
+        {
+            return false;
+        }
+        return true;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

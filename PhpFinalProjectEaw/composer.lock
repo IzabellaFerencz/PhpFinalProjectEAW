@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce7ba8f5088a2d150487333f9602f628",
+    "content-hash": "cebb4e5cfca69760522220b867a490db",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -5800,6 +5800,7 @@
                 "code",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-code",
             "time": "2019-10-05T23:18:22+00:00"
         },
         {
@@ -5854,6 +5855,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2018-04-25T15:33:34+00:00"
         }
     ],
@@ -5962,16 +5964,16 @@
         },
         {
             "name": "symfony/browser-kit",
-            "version": "v4.3.5",
+            "version": "v4.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/browser-kit.git",
-                "reference": "78b7611c45039e8ce81698be319851529bf040b1"
+                "reference": "66d301ce3458b522e3b1f2a76ecfccd1834dcf90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/78b7611c45039e8ce81698be319851529bf040b1",
-                "reference": "78b7611c45039e8ce81698be319851529bf040b1",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/66d301ce3458b522e3b1f2a76ecfccd1834dcf90",
+                "reference": "66d301ce3458b522e3b1f2a76ecfccd1834dcf90",
                 "shasum": ""
             },
             "require": {
@@ -6017,20 +6019,20 @@
             ],
             "description": "Symfony BrowserKit Component",
             "homepage": "https://symfony.com",
-            "time": "2019-09-10T11:25:17+00:00"
+            "time": "2020-01-04T12:24:57+00:00"
         },
         {
             "name": "symfony/css-selector",
-            "version": "v4.3.5",
+            "version": "v4.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9"
+                "reference": "32203e7cc318dcfd1d5fb12ab35e595fc6016206"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9",
-                "reference": "f4b3ff6a549d9ed28b2b0ecd1781bf67cf220ee9",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/32203e7cc318dcfd1d5fb12ab35e595fc6016206",
+                "reference": "32203e7cc318dcfd1d5fb12ab35e595fc6016206",
                 "shasum": ""
             },
             "require": {
@@ -6070,7 +6072,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2019-10-02T08:36:26+00:00"
+            "time": "2020-01-04T12:24:57+00:00"
         },
         {
             "name": "symfony/debug-bundle",
@@ -6299,26 +6301,26 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v4.3.5",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "a7fd9e742c31ac2b607b166c9016bab51a36c574"
+                "reference": "7f835941a01bea2d03776451c9e42c2a2da6c34c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/a7fd9e742c31ac2b607b166c9016bab51a36c574",
-                "reference": "a7fd9e742c31ac2b607b166c9016bab51a36c574",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/7f835941a01bea2d03776451c9e42c2a2da6c34c",
+                "reference": "7f835941a01bea2d03776451c9e42c2a2da6c34c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.9"
             },
             "conflict": {
-                "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+                "phpunit/phpunit": "<5.4.3"
             },
             "suggest": {
-                "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
+                "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
             },
             "bin": [
                 "bin/simple-phpunit"
@@ -6326,7 +6328,7 @@
             "type": "symfony-bridge",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.3-dev"
+                    "dev-master": "5.0-dev"
                 },
                 "thanks": {
                     "name": "phpunit/phpunit",
@@ -6360,7 +6362,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2019-10-02T08:36:26+00:00"
+            "time": "2020-01-21T08:40:24+00:00"
         },
         {
             "name": "symfony/profiler-pack",

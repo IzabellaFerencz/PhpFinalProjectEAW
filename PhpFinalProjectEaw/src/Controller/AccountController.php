@@ -216,6 +216,17 @@ class AccountController extends AbstractController
             $profile->setAddress($adr);
             $profile->setPhonenr($phone);
 
+            if(!$profile->isValid())
+            {
+                return $this->render('account/createprofile.html.twig', [
+                    'Firstname' => $fname,
+                    'Lastname' => $lname,
+                    'PhoneNr' => $phone,
+                    'Address' => $adr,
+                    'Message' => "Invalid profile!"
+                    ]);
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
@@ -299,6 +310,14 @@ class AccountController extends AbstractController
             $profile->setLastname($lname);
             $profile->setAddress($adr);
             $profile->setPhonenr($phone);
+
+            if(!$profile->isValid())
+            {
+                return $this->render('account/editprofile.html.twig', [
+                    'profile' => $profile,
+                    'Message' => "Invalid profile!"
+                    ]);
+            }
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->flush();
