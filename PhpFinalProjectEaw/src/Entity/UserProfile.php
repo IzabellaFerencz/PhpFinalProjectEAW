@@ -36,9 +36,14 @@ class UserProfile
      */
     private $lastname;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $email;
+
     public function isValid()
     {
-        if($this->address == "" || $this->phonenr == "" || $this->firstname == "" || $this->lastname == "")
+        if($this->address == "" || $this->phonenr == "" || $this->firstname == "" || $this->lastname == "" || $this->email == "")
         {
             return false;
         }
@@ -70,6 +75,18 @@ class UserProfile
     public function setPhonenr(string $phonenr): self
     {
         $this->phonenr = $phonenr;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }

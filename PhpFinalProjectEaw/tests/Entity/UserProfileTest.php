@@ -13,10 +13,24 @@ class UserProfileTest extends TestCase
         $profile->setFirstname("fname");
         $profile->setLastname("lname");
         $profile->setPhonenr("0729447272");
+        $profile->setEmail("test@mail.com");
 
         $result = $profile->isValid();
 
         $this->assertEquals(true, $result);
+    }
+
+    public function testNoMailProfile()
+    {
+        $profile = new UserProfile();
+        $profile->setAddress("test address");
+        $profile->setFirstname("fname");
+        $profile->setLastname("lname");
+        $profile->setPhonenr("0729447272");
+
+        $result = $profile->isValid();
+
+        $this->assertEquals(false, $result);
     }
 
     public function testNoAddressProfile()
@@ -25,6 +39,7 @@ class UserProfileTest extends TestCase
         $profile->setFirstname("fname");
         $profile->setLastname("lname");
         $profile->setPhonenr("0729447272");
+        $profile->setEmail("test@mail.com");
 
         $result = $profile->isValid();
 
@@ -37,6 +52,7 @@ class UserProfileTest extends TestCase
         $profile->setAddress("test address");
         $profile->setLastname("lname");
         $profile->setPhonenr("0729447272");
+        $profile->setEmail("test@mail.com");
 
         $result = $profile->isValid();
 
@@ -49,6 +65,7 @@ class UserProfileTest extends TestCase
         $profile->setAddress("test address");
         $profile->setFirstname("fname");
         $profile->setPhonenr("0729447272");
+        $profile->setEmail("test@mail.com");
 
         $result = $profile->isValid();
 
@@ -61,6 +78,7 @@ class UserProfileTest extends TestCase
         $profile->setAddress("test address");
         $profile->setFirstname("fname");
         $profile->setLastname("lname");
+        $profile->setEmail("test@mail.com");
 
         $result = $profile->isValid();
 

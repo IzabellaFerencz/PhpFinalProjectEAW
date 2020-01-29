@@ -168,6 +168,7 @@ class AccountController extends AbstractController
             'Lastname' => "",
             'PhoneNr' => "",
             'Address' => "",
+            'Email' => "",
             'Message' => ""
             ]);
     }
@@ -198,8 +199,9 @@ class AccountController extends AbstractController
             $lname = $_POST["lastname"];
             $phone = $_POST["phonenr"];
             $adr = $_POST["address"];
+            $mail = $_POST["email"];
 
-            if($fname == "" || $lname == "" || $phone == "" || $adr == "")
+            if($fname == "" || $lname == "" || $phone == "" || $adr == "" || $mail == "")
             {
                 return $this->render('account/createprofile.html.twig', [
                     'Firstname' => $fname,
@@ -215,6 +217,7 @@ class AccountController extends AbstractController
             $profile->setLastname($lname);
             $profile->setAddress($adr);
             $profile->setPhonenr($phone);
+            $profile->setEmail($mail);
 
             if(!$profile->isValid())
             {
@@ -223,6 +226,7 @@ class AccountController extends AbstractController
                     'Lastname' => $lname,
                     'PhoneNr' => $phone,
                     'Address' => $adr,
+                    'Email' => $mail,
                     'Message' => "Invalid profile!"
                     ]);
             }
@@ -297,8 +301,9 @@ class AccountController extends AbstractController
             $lname = $_POST["lastname"];
             $phone = $_POST["phonenr"];
             $adr = $_POST["address"];
+            $mail = $_POST["email"];
 
-            if($fname == "" || $lname == "" || $phone == "" || $adr == "")
+            if($fname == "" || $lname == "" || $phone == "" || $adr == "" || $mail == "")
             {
                 return $this->render('account/editprofile.html.twig', [
                     'profile' => $profile,
@@ -310,6 +315,7 @@ class AccountController extends AbstractController
             $profile->setLastname($lname);
             $profile->setAddress($adr);
             $profile->setPhonenr($phone);
+            $profile->setEmail($mail);
 
             if(!$profile->isValid())
             {
