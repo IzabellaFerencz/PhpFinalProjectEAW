@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\PostRequest;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Entity\UserProfile;
 use App\Form\PostRequestType;
 use App\Repository\PostRequestRepository;
+use App\Helpers\EmailSender;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -115,7 +117,21 @@ class PostRequestController extends AbstractController
             $post->setStatus("Resolved");
         }
         $entityManager->flush();
-        return $this->redirectToRoute('view_post_requests/'.$post->getId());
+
+        $profileId = $postRequest->getUserid()->getUserprofileid();
+        $profile = $this->getDoctrine()->getRepository(UserProfile::class)->find($profileId);
+
+        if($profile != null)
+        {
+            $emailSender = new EmailSender();
+            $displayName = $profile->getFirstname()." ".$profile->getLastname();
+            $subject = "Request ".$reply;
+            $postTitle = $postRequest->getPostid()->getTitle();
+            $content = "Hello ".$displayName.", <br>Your request for post with title ".$postTitle." has been ".$reply."<br>You can view the status of your requests by accessing the <strong>My Requests</strong> section on our website.";
+            $emailSender->sendMail($profile->getEmail(),$displayName,$subject,$content);
+        }
+
+        return $this->redirectToRoute('/view_post_requests/'.$post->getId());
     }
 
     /**
@@ -153,6 +169,20 @@ class PostRequestController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($postRequest);
         $entityManager->flush();
+
+        $profileId = $postRequest->getPostid()->getUserid()->getUserprofileid();
+        $profile = $this->getDoctrine()->getRepository(UserProfile::class)->find($profileId);
+
+        if($profile != null)
+        {
+            $emailSender = new EmailSender();
+            $displayName = $profile->getFirstname()." ".$profile->getLastname();
+            $subject = "New request recieved";
+            $requestUser = $postRequest->getUserid()->getUsername();
+            $postTitle = $postRequest->getPostid()->getTitle();
+            $content = "Hello ".$displayName.", <br>You recieved a new request from ".$requestUser." for your post with title: ".$postTitle."<br>You can view your requests by accessing the <strong>View Requests</strong> section of your post.";
+            $emailSender->sendMail($profile->getEmail(),$displayName,$subject,$content);
+        }
 
         return $this->render('post_request/show.html.twig', [
             'post_request' => $postRequest,

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Controller;
-
 use App\Entity\Post;
 use App\Entity\User;
 use App\Form\PostType;
@@ -20,9 +19,9 @@ class PostController extends AbstractController
      * @Route("/", name="post_index", methods={"GET"})
      */
     public function index(PostRepository $postRepository): Response
-    {
+    {  
         return $this->render('post/index.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'posts' => $postRepository->findAll()
         ]);
     }
 

@@ -95,7 +95,7 @@ class AccountController extends AbstractController
         }
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
 
-        if(password_verify($password, $user->getPassword()))
+        if($user != null && password_verify($password, $user->getPassword()))
         {
             $session = $this->get('session');
             $session->set('username',$username);
@@ -241,6 +241,7 @@ class AccountController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' =>"Something went wrong",
+                //'Message' =>$profile,
                 ]);
         }
 
