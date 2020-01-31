@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Helpers\LuceneSearcher;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 /**
  * @Route("/post")
@@ -22,6 +25,32 @@ class PostController extends AbstractController
     {  
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll()
+        ]);
+    }
+
+    /**
+     * @Route("/search", name="post_search", methods={"POST"})
+     */
+    public function search(PostRepository $postRepository): Response
+    {
+        $allPosts = $postRepository->findAll();
+        foreach($allPosts as $post)
+        {
+            LuceneSearcher::updateLuceneIndex($post);
+        }
+
+        $searchTerm = $_POST["searchTerm"];
+        $hits = LuceneSearcher::getLuceneIndex()->find($searchTerm);
+
+        $results = new ArrayCollection();
+        foreach($hits as $hit) {
+            $document = $hit->getDocument();
+            $res = $postRepository-> find($document->key);
+            $results -> add($res);
+        }
+
+        return $this->render('post/index.html.twig', [
+            'posts' => $results
         ]);
     }
 
