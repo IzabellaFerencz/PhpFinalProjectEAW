@@ -20,13 +20,13 @@ class UserRoles
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $userid;
+    private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Roles")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $roleid;
+    private $roles;
 
     public function getId(): ?int
     {
@@ -35,24 +35,24 @@ class UserRoles
 
     public function getUserid(): ?User
     {
-        return $this->userid;
+        return $this->user;
     }
 
     public function setUserid(?User $userid): self
     {
-        $this->userid = $userid;
+        $this->user = $userid;
 
         return $this;
     }
 
     public function getRoleid(): ?Roles
     {
-        return $this->roleid;
+        return $this->roles;
     }
 
     public function setRoleid(?Roles $roleid): self
     {
-        $this->roleid = $roleid;
+        $this->roles = $roleid;
 
         return $this;
     }

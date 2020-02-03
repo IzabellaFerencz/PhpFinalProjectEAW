@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\UserRoles;
+use App\Entity\Roles;
 use App\Entity\PostRequest;
 use App\Entity\Post;
 use App\Entity\User;
@@ -19,11 +21,34 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PostRequestController extends AbstractController
 {
+
+    private function checkIsLoggedUserAdmin()
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return false;
+        }
+        $roles =  $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
+        foreach($roles as $role)
+        {
+            if($role->getRoleid()->getRolename()=="ROLE_ADMIN")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @Route("/my_requests", name="post_request_index", methods={"GET"})
      */
     public function index()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $session = $this->get('session');
         $username = $session->get('username');
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
@@ -31,6 +56,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -39,6 +65,7 @@ class PostRequestController extends AbstractController
         return $this->render('post_request/index.html.twig', [
             'post_requests' => $repo->findByUserId($user->getId()),
             'accept_actions'=>false,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -47,11 +74,14 @@ class PostRequestController extends AbstractController
      */
     public function view_post_requests($postid)
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $post = $this->getDoctrine()->getRepository(Post::class)->find($postid);
         if($post == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post found with id=".$postid,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -62,6 +92,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -70,6 +101,7 @@ class PostRequestController extends AbstractController
         return $this->render('post_request/index.html.twig', [
             'post_requests' => $repo->findByPostId($postid),
             'accept_actions'=>true,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -78,11 +110,14 @@ class PostRequestController extends AbstractController
      */
     public function reply($id, $reply)
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $postRequest = $this->getDoctrine()->getRepository(PostRequest::class)->find($id);
         if($postRequest == null )
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post request was found with id=".$id,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $session = $this->get('session');
@@ -92,6 +127,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -100,6 +136,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -107,6 +144,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "Post is not Active!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -139,11 +177,14 @@ class PostRequestController extends AbstractController
      */
     public function send($postid)
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $post = $this->getDoctrine()->getRepository(Post::class)->find($postid);
         if($post == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post was found with id=".$id,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $session = $this->get('session');
@@ -153,6 +194,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized to send requests to this post!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -160,6 +202,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You cant send requests to your post!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $postRequest = new PostRequest();
@@ -186,6 +229,7 @@ class PostRequestController extends AbstractController
 
         return $this->render('post_request/show.html.twig', [
             'post_request' => $postRequest,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -194,6 +238,8 @@ class PostRequestController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $postRequest = new PostRequest();
         $form = $this->createForm(PostRequestType::class, $postRequest);
         $form->handleRequest($request);
@@ -209,6 +255,7 @@ class PostRequestController extends AbstractController
         return $this->render('post_request/new.html.twig', [
             'post_request' => $postRequest,
             'form' => $form->createView(),
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -217,11 +264,14 @@ class PostRequestController extends AbstractController
      */
     public function show($id)
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $postRequest = $this->getDoctrine()->getRepository(PostRequest::class)->find($id);
         if($postRequest == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No request found with id=".$id,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $session = $this->get('session');
@@ -231,6 +281,7 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized to view requests for this post!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -238,10 +289,12 @@ class PostRequestController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         return $this->render('post_request/show.html.twig', [
             'post_request' => $postRequest,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -250,6 +303,8 @@ class PostRequestController extends AbstractController
      */
     public function edit(Request $request, PostRequest $postRequest): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $form = $this->createForm(PostRequestType::class, $postRequest);
         $form->handleRequest($request);
 
@@ -262,6 +317,7 @@ class PostRequestController extends AbstractController
         return $this->render('post_request/edit.html.twig', [
             'post_request' => $postRequest,
             'form' => $form->createView(),
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -270,6 +326,8 @@ class PostRequestController extends AbstractController
      */
     public function delete(Request $request, PostRequest $postRequest): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         if ($this->isCsrfTokenValid('delete'.$postRequest->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($postRequest);

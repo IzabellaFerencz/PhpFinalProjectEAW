@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\UserRoles;
+use App\Entity\Roles;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,14 +16,37 @@ use App\Entity\UserProfile;
  */
 class AccountController extends AbstractController
 {
+    private function checkIsLoggedUserAdmin()
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return false;
+        }
+        $roles =  $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
+        foreach($roles as $role)
+        {
+            if($role->getRoleid()->getRolename()=="ROLE_ADMIN")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @Route("/register", name="register", methods={"GET"})
      */
     public function register()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         return $this->render('account/register.html.twig', [
             'Username' => "",
-            'Message' => ""
+            'Message' => "",
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -30,6 +55,8 @@ class AccountController extends AbstractController
      */
     public function register_user()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $username = $_POST["username"];
         $password = $_POST["password"];
         if($username == "" || $password == "")
@@ -37,6 +64,7 @@ class AccountController extends AbstractController
             return $this->render('account/register.html.twig', [
                 'Username' => $username,
                 'Message' => "Username and password can't be empty",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $confpassword = $_POST["confpassword"];
@@ -45,6 +73,7 @@ class AccountController extends AbstractController
             return $this->render('account/register.html.twig', [
                 'Username' => $username,
                 'Message' => "Password and confirmation password do not match",
+                'IsAdmin'=>$isAdmin
                 ]);
             
         }
@@ -62,6 +91,7 @@ class AccountController extends AbstractController
             return $this->render('account/register.html.twig', [
                 'Username' => $username,
                 'Message' => "Username already exists. Please use a different username or log in to your account.",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -73,9 +103,12 @@ class AccountController extends AbstractController
      */
     public function login()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         return $this->render('account/login.html.twig', [
             'Username' => "",
-            'Message' => ""
+            'Message' => "",
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -84,6 +117,8 @@ class AccountController extends AbstractController
      */
     public function loginuser()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $username = $_POST["username"];
         $password = $_POST["password"];
         if($username == "" || $password == "")
@@ -91,6 +126,7 @@ class AccountController extends AbstractController
             return $this->render('account/login.html.twig', [
                 'Username' => $username,
                 'Message' => "Username and password cant be empty",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
@@ -106,6 +142,7 @@ class AccountController extends AbstractController
             return $this->render('account/login.html.twig', [
                 'Username' => $username,
                 'Message' => "Incorrect username or password",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -127,12 +164,15 @@ class AccountController extends AbstractController
      */
     public function profile()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         try {
             $session = $this->get('session');
             $username = $session->get('username');
             if($username==''){
                 return $this->render('account/error.html.twig', [
                     'Message' => "You must be logged in!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
@@ -143,10 +183,12 @@ class AccountController extends AbstractController
             }
             return $this->render('account/profile.html.twig', [
                 'profile' => $userprofile,
+                'IsAdmin'=>$isAdmin
                 ]);
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' => $th,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
     }
@@ -156,11 +198,14 @@ class AccountController extends AbstractController
      */
     public function create_profile()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $session = $this->get('session');
         $username = $session->get('username');
         if($username==''){
             return $this->render('account/error.html.twig', [
                 'Message' => "You must be logged in to create a profile!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         return $this->render('account/createprofile.html.twig', [
@@ -169,7 +214,8 @@ class AccountController extends AbstractController
             'PhoneNr' => "",
             'Address' => "",
             'Email' => "",
-            'Message' => ""
+            'Message' => "",
+            'IsAdmin'=>$isAdmin
             ]);
     }
 
@@ -178,6 +224,8 @@ class AccountController extends AbstractController
      */
     public function create_profile_post()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         try {
             $session = $this->get('session');
             $username = $session->get('username');
@@ -187,12 +235,14 @@ class AccountController extends AbstractController
                 
                 return $this->render('account/error.html.twig', [
                     'Message' => "You must be logged in to create a profile!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             if($user->getUserprofileid()!=null)
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "You already have profile. You can edit your existing profile.",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $fname = $_POST["firstname"];
@@ -208,7 +258,8 @@ class AccountController extends AbstractController
                     'Lastname' => $lname,
                     'PhoneNr' => $phone,
                     'Address' => $adr,
-                    'Message' => "All fields are mandatory!"
+                    'Message' => "All fields are mandatory!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
 
@@ -227,7 +278,8 @@ class AccountController extends AbstractController
                     'PhoneNr' => $phone,
                     'Address' => $adr,
                     'Email' => $mail,
-                    'Message' => "Invalid profile!"
+                    'Message' => "Invalid profile!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
 
@@ -241,6 +293,7 @@ class AccountController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' =>"Something went wrong",
+                'IsAdmin'=>$isAdmin
                 //'Message' =>$profile,
                 ]);
         }
@@ -254,6 +307,8 @@ class AccountController extends AbstractController
      */
     public function edit_profile()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         try {
             $session = $this->get('session');
             $username = $session->get('username');
@@ -262,16 +317,19 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "You must be logged in to edit your profile!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $userprofile = $user->getUserprofileid();
             return $this->render('account/editprofile.html.twig', [
                 'profile'=>$userprofile,
-                'Message' => ""
+                'Message' => "",
+                'IsAdmin'=>$isAdmin
                 ]);
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' =>"Something went wrong",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
     }
@@ -281,6 +339,8 @@ class AccountController extends AbstractController
      */
     public function edit_profile_post()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         try {
             $session = $this->get('session');
             $username = $session->get('username');
@@ -289,6 +349,7 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "You must be logged in to edit your profile!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $profile = $user->getUserprofileid();
@@ -296,6 +357,7 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "You dont have a profile. Please create one first.",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $fname = $_POST["firstname"];
@@ -308,7 +370,8 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/editprofile.html.twig', [
                     'profile' => $profile,
-                    'Message' => "All fields are mandatory!"
+                    'Message' => "All fields are mandatory!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
 
@@ -322,7 +385,8 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/editprofile.html.twig', [
                     'profile' => $profile,
-                    'Message' => "Invalid profile!"
+                    'Message' => "Invalid profile!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
 
@@ -332,6 +396,7 @@ class AccountController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' =>"Something went wrong",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -343,14 +408,18 @@ class AccountController extends AbstractController
      */
     public function delete_profile_check()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         $session = $this->get('session');
         $username = $session->get('username');
         if($username==''){
             return $this->render('account/error.html.twig', [
                 'Message' =>"You must be logged in.",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         return $this->render('account/deleteprofile.html.twig', [
+            'IsAdmin'=>$isAdmin
             ]);
     }
 
@@ -359,6 +428,8 @@ class AccountController extends AbstractController
      */
     public function delete_profile()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
+
         try {
             $session = $this->get('session');
             $username = $session->get('username');
@@ -367,6 +438,7 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "User not found!",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $profile = $user->getUserprofileid();
@@ -374,6 +446,7 @@ class AccountController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "You dont have a profile. Please create one first.",
+                    'IsAdmin'=>$isAdmin
                     ]);
             }
             $entityManager = $this->getDoctrine()->getManager();
@@ -385,6 +458,7 @@ class AccountController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' =>"Something went wrong",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
     }

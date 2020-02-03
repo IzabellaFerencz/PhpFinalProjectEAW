@@ -20,7 +20,9 @@
                         <li><a href="/account/profile">My Profile</a></li>
                         <li><a href="/post/request/my_requests">My Requests</a></li>
                         <li><a href="/post/my_posts">My Posts</a></li>
-                        <li><a href="/user/roles/index">View Users</a></li>
+                        {% if IsAdmin == true %}
+                            <li><a href="/user/roles/index">View Users</a></li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 {% if app.session.get('username')!='' %}

@@ -17,6 +17,25 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UserRolesController extends AbstractController
 {
+    private function checkIsLoggedUserAdmin()
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return false;
+        }
+        $roles =  $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
+        foreach($roles as $role)
+        {
+            if($role->getRoleid()->getRolename()=="ROLE_ADMIN")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private function verifyUser(): bool
     {
@@ -25,14 +44,12 @@ class UserRolesController extends AbstractController
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
         if($user == null)
         {
-            return $this->render('account/error.html.twig', [
-                'Message' => "You are not authorized",
-                ]);
+           return false;
         }
         $roles = $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
         foreach ($roles as $role) 
         {
-            if($role->getRoleId()->getRolename() == "admin")
+            if($role->getRoleId()->getRolename() == "ROLE_ADMIN")
             {
                 return true;
             }
@@ -49,6 +66,7 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized",
+                'IsAdmin'=>false
                 ]);
         }
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
@@ -56,13 +74,15 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No user found with given id!",
+                'IsAdmin'=>true
                 ]);
         }
         $roles = $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($id);
 
         return $this->render('user_roles/user_with_roles.html.twig', [
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
+            'IsAdmin'=>true
         ]);
     }
 
@@ -75,11 +95,13 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized",
+                'IsAdmin'=>false
                 ]);
         }
         $users =$this->getDoctrine()->getRepository(User::class)->findAll();
         return $this->render('user_roles/viewusers.html.twig', [
             'users' => $users,
+            'IsAdmin'=>true
             ]);
     }
 
@@ -92,6 +114,7 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized",
+                'IsAdmin'=>false
                 ]);
         }
         $user =$this->getDoctrine()->getRepository(User::class)->find($userId);
@@ -99,12 +122,14 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No user with given id!",
+                'IsAdmin'=>true
                 ]);
         }
         $roles = $this->getDoctrine()->getRepository(Roles::class)->findAll();
         return $this->render('user_roles/addrole.html.twig', [
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
+            'IsAdmin'=>true
             ]);
     }
 
@@ -117,6 +142,7 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized",
+                'IsAdmin'=>false
                 ]);
         }
         $userid = $_POST["userid"];
@@ -127,12 +153,14 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No user with given id!",
+                'IsAdmin'=>true
                 ]);
         }
         if($role == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No role with given id!",
+                'IsAdmin'=>true
                 ]);
         }
 
@@ -142,6 +170,7 @@ class UserRolesController extends AbstractController
             {
                 return $this->render('account/error.html.twig', [
                     'Message' => "Role is already assigned to user!",
+                    'IsAdmin'=>true
                     ]);
             }
             $userRole = new UserRoles();
@@ -153,6 +182,7 @@ class UserRolesController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' => "Failed to add role!",
+                'IsAdmin'=>true
                 ]);
         }
         return $this->redirectToRoute('roles_of_user', ['id' => $userRole->getUserid()]);
@@ -167,6 +197,7 @@ class UserRolesController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized",
+                'IsAdmin'=>false
                 ]);
         }
         try 

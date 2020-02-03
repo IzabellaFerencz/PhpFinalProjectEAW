@@ -3,6 +3,8 @@
 namespace App\Controller;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Entity\UserRoles;
+use App\Entity\Roles;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,13 +20,35 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class PostController extends AbstractController
 {
+    private function checkIsLoggedUserAdmin()
+    {
+        $session = $this->get('session');
+        $username = $session->get('username');
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
+        if($user == null)
+        {
+            return false;
+        }
+        $roles =  $this->getDoctrine()->getRepository(UserRoles::class)->findByUserId($user->getId());
+        foreach($roles as $role)
+        {
+            if($role->getRoleid()->getRolename()=="ROLE_ADMIN")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @Route("/", name="post_index", methods={"GET"})
      */
     public function index(PostRepository $postRepository): Response
     {  
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         return $this->render('post/index.html.twig', [
-            'posts' => $postRepository->findAll()
+            'posts' => $postRepository->findAll(),
+            'IsAdmin' => $isAdmin
         ]);
     }
 
@@ -33,6 +57,7 @@ class PostController extends AbstractController
      */
     public function search(PostRepository $postRepository): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $allPosts = $postRepository->findAll();
         foreach($allPosts as $post)
         {
@@ -46,11 +71,15 @@ class PostController extends AbstractController
         foreach($hits as $hit) {
             $document = $hit->getDocument();
             $res = $postRepository-> find($document->key);
-            $results -> add($res);
+            if($res != null)
+            {
+                $results -> add($res);
+            }
         }
 
         return $this->render('post/index.html.twig', [
-            'posts' => $results
+            'posts' => $results,
+            'IsAdmin' => $isAdmin
         ]);
     }
 
@@ -59,6 +88,7 @@ class PostController extends AbstractController
      */
     public function my_posts(PostRepository $postRepository): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $session = $this->get('session');
         $username = $session->get('username');
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
@@ -69,6 +99,7 @@ class PostController extends AbstractController
         }
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findByUserId($user->getId()),
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -77,6 +108,7 @@ class PostController extends AbstractController
      */
     public function newpost()
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $session = $this->get('session');
         $username = $session->get('username');
         if($username==''){
@@ -88,7 +120,8 @@ class PostController extends AbstractController
             'Title' => "",
             'Description' => "",
             'Message' => "",
-            'Price' =>""
+            'Price' =>"",
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -97,6 +130,7 @@ class PostController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $session = $this->get('session');
         $username = $session->get('username');
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByUsername($username);
@@ -116,7 +150,8 @@ class PostController extends AbstractController
                 'Title' => $title,
                 'Description' => $description,
                 'Price' => $price,
-                'Message' => "All Fields are mandatory"
+                'Message' => "All Fields are mandatory",
+                'IsAdmin'=>$isAdmin
             ]);
         }
 
@@ -126,7 +161,8 @@ class PostController extends AbstractController
                 'Title' => $title,
                 'Description' => $description,
                 'Price' => $price,
-                'Message' => "All new post must be in active state!"
+                'Message' => "All new post must be in active state!",
+                'IsAdmin'=>$isAdmin
             ]);
         }
 
@@ -144,7 +180,8 @@ class PostController extends AbstractController
                     'Title' => $title,
                     'Description' => $description,
                     'Price' => $price,
-                    'Message' => "Post is in invalid state."
+                    'Message' => "Post is in invalid state.",
+                    'IsAdmin'=>$isAdmin
                 ]);
             }
 
@@ -154,6 +191,7 @@ class PostController extends AbstractController
         } catch (\Throwable $th) {
             return $this->render('account/error.html.twig', [
                 'Message' => "Something went wrong!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -165,15 +203,18 @@ class PostController extends AbstractController
      */
     public function show($id): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
         if($post == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post found with given id!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         return $this->render('post/show.html.twig', [
             'post' => $post,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -182,11 +223,13 @@ class PostController extends AbstractController
      */
     public function editpost($id)
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
         if($post == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post was found with id=".$id,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $session = $this->get('session');
@@ -196,11 +239,13 @@ class PostController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized to edit this post!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         return $this->render('post/edit.html.twig', [
             'post' => $post,
-            'Message' => ""
+            'Message' => "",
+            'IsAdmin'=>$isAdmin
         ]);
     }
 
@@ -209,11 +254,13 @@ class PostController extends AbstractController
      */
     public function edit($id): Response
     {
+        $isAdmin = $this->checkIsLoggedUserAdmin();
         $post = $this->getDoctrine()->getRepository(Post::class)->find($id);
         if($post == null)
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "No post was found with id=".$id,
+                'IsAdmin'=>$isAdmin
                 ]);
         }
         $session = $this->get('session');
@@ -223,6 +270,7 @@ class PostController extends AbstractController
         {
             return $this->render('account/error.html.twig', [
                 'Message' => "You are not authorized to edit this post!",
+                'IsAdmin'=>$isAdmin
                 ]);
         }
 
@@ -235,7 +283,8 @@ class PostController extends AbstractController
         {
             return $this->render('post/edit.html.twig', [
                 'post' => $post,
-                'Message' => "All Fields are mandatory"
+                'Message' => "All Fields are mandatory",
+                'IsAdmin'=>$isAdmin
             ]);
         }
 
@@ -243,7 +292,8 @@ class PostController extends AbstractController
         {
             return $this->render('post/edit.html.twig', [
                 'post' => $post,
-                'Message' => "Invalid value for status"
+                'Message' => "Invalid value for status",
+                'IsAdmin'=>$isAdmin
             ]);
         }
 
@@ -256,7 +306,8 @@ class PostController extends AbstractController
         {
             return $this->render('post/edit.html.twig', [
                 'post' => $post,
-                'Message' => "Post is in invalid state."
+                'Message' => "Post is in invalid state.",
+                'IsAdmin'=>$isAdmin
             ]);
         }
 
@@ -265,6 +316,7 @@ class PostController extends AbstractController
 
         return $this->render('post/show.html.twig', [
             'post' => $post,
+            'IsAdmin'=>$isAdmin
         ]);
     }
 

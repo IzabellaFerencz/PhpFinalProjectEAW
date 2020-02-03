@@ -26,7 +26,7 @@ class UserRolesRepository extends ServiceEntityRepository
     public function findByUserId($value)
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.userid = :val')
+            ->andWhere('u.user = :val')
             ->setParameter('val', $value)
             ->orderBy('u.id', 'ASC')
             ->setMaxResults(10)
@@ -38,9 +38,9 @@ class UserRolesRepository extends ServiceEntityRepository
     public function findByUserIdAndRoleId($userid, $roleid)
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.userid = :val1')
+            ->andWhere('u.user = :val1')
             ->setParameter('val1', $userid)
-            ->andWhere('u.roleid = :val2')
+            ->andWhere('u.roles = :val2')
             ->setParameter('val2', $roleid)            
             ->orderBy('u.id', 'ASC')
             ->setMaxResults(10)
